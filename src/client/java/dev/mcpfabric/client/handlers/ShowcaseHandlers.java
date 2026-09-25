@@ -76,6 +76,8 @@ public final class ShowcaseHandlers {
 			boolean acceptPack = ctx.optBool("acceptResourcePack", true);
 			return ClientMc.call(() -> {
 				Minecraft mc = ClientMc.mc();
+				// While the startup resource reload is running a connection request is silently dropped.
+				if (mc.getOverlay() != null) throw RpcException.unavailable("The client is still loading resources: retry in a few seconds.");
 				if (mc.level != null) {
 					mc.disconnect(new TitleScreen(), false);
 				}

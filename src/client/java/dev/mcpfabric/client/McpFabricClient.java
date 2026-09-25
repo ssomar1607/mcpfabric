@@ -8,6 +8,7 @@ import dev.mcpfabric.client.handlers.InteractHandlers;
 import dev.mcpfabric.client.handlers.InventoryHandlers;
 import dev.mcpfabric.client.handlers.LocalPlayerHandlers;
 import dev.mcpfabric.client.handlers.NavHandlers;
+import dev.mcpfabric.client.handlers.ShowcaseHandlers;
 import dev.mcpfabric.client.handlers.VisionHandlers;
 import net.minecraft.client.Minecraft;
 
@@ -33,6 +34,7 @@ public final class McpFabricClient {
 		InventoryHandlers.register(router);
 		VisionHandlers.register(router);
 		NavHandlers.register(router);
+		ShowcaseHandlers.register(router); // perspective, HUD, connect, screenshot to file, video recording
 		ClientChatHandlers.register(router); // client variant of chat.send (speaks as local player)
 
 		McpFabric.LOGGER.info("[mcpfabric] client handlers registered");

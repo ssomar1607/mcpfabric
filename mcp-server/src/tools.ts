@@ -548,6 +548,101 @@ export const TOOLS: ToolDef[] = [
     annotations: READ,
   },
 
+  // ===== showcase / visual QA (client) =======================================================
+  {
+    name: "set_perspective",
+    method: "view.setPerspective",
+    title: "Set camera perspective (F5)",
+    description:
+      "Client-only. Switch the camera like F5: first_person (item in hand as the player sees it), third_person_back (behind the player) or third_person_front (facing the player, shows held items and worn armor from the front).",
+    inputSchema: { mode: z.enum(["first_person", "third_person_back", "third_person_front"]) },
+  },
+  {
+    name: "set_hud",
+    method: "view.setHud",
+    title: "Hide / show the HUD (F1)",
+    description: "Client-only. hidden=true hides the HUD and hand-free GUI like F1 (clean shots and videos); hidden=false restores it.",
+    inputSchema: { hidden: z.boolean().optional().default(true) },
+  },
+  {
+    name: "set_chat",
+    method: "view.setChat",
+    title: "Hide / show the chat overlay",
+    description:
+      "Client-only. hidden=true makes the chat overlay invisible (local opacity 0) while messages keep arriving (get_recent_chat still works). Use it for first-person shots, where set_hud would also hide the hand.",
+    inputSchema: { hidden: z.boolean().optional().default(true) },
+  },
+  {
+    name: "set_fov",
+    method: "view.setFov",
+    title: "Set field of view",
+    description: "Client-only. Set the field of view option (30..110, vanilla default 70). Lower values give a tighter, more cinematic framing.",
+    inputSchema: { fov: z.number().int().min(30).max(110) },
+  },
+  {
+    name: "view_state",
+    method: "view.state",
+    title: "Camera / window state",
+    description: "Client-only. Current perspective, HUD visibility, field of view, window size and whether the client is in a world.",
+    inputSchema: {},
+    annotations: READ,
+  },
+  {
+    name: "connect_server",
+    method: "client.connect",
+    title: "Join a multiplayer server",
+    description:
+      "Client-only. Disconnect from the current world (if any) and join the server at `address` (host:port), accepting its resource pack without the prompt so plugins' packs are downloaded and applied. Returns immediately: poll get_status / view_state until inWorld is true (the pack download can take a few seconds).",
+    inputSchema: {
+      address: z.string().describe('Server address, e.g. "127.0.0.1:25565" or "172.17.220.53:25599".'),
+      acceptResourcePack: z.boolean().optional().default(true),
+      name: z.string().optional(),
+    },
+  },
+  {
+    name: "disconnect_server",
+    method: "client.disconnect",
+    title: "Leave the current server/world",
+    description: "Client-only. Disconnect and go back to the title screen.",
+    inputSchema: {},
+  },
+  {
+    name: "screenshot_to_file",
+    method: "vision.screenshotToFile",
+    title: "Save a screenshot to a file",
+    description:
+      "Client-only. Capture the current frame at full resolution and write it as PNG to `path` (a path on the machine running Minecraft). Use it for high-resolution captures and batches; returns the path and size instead of the image data.",
+    inputSchema: { path: z.string().describe("Destination PNG path on the game machine.") },
+  },
+  {
+    name: "start_recording",
+    method: "record.start",
+    title: "Start video recording",
+    description:
+      "Client-only. Record the game view in real time to an MP4 (H.264) at `path` on the game machine, at a fixed frame rate paced by the wall clock (the video lasts exactly as long as the recording, animations play at their real speed). Needs ffmpeg (ffmpegPath in mcpfabric.config.json). Do not resize the window while recording. Stop with stop_recording.",
+    inputSchema: {
+      path: z.string().describe("Destination .mp4 path on the game machine."),
+      fps: z.number().int().min(10).max(120).optional().default(60),
+      codec: z.enum(["libx264", "h264_nvenc"]).optional().default("libx264").describe("h264_nvenc uses an NVIDIA GPU encoder (lighter on the CPU)."),
+      quality: z.number().int().min(0).max(51).optional().describe("CRF/CQ: lower is better. Default 16 (x264) / 19 (nvenc)."),
+    },
+  },
+  {
+    name: "stop_recording",
+    method: "record.stop",
+    title: "Stop video recording",
+    description: "Client-only. Stop the recording and wait for the MP4 to be finalized. Returns the path, resolution, frame count and duration.",
+    inputSchema: {},
+  },
+  {
+    name: "recording_status",
+    method: "record.status",
+    title: "Recording status",
+    description: "Client-only. Whether a recording is running, its path, frames written, elapsed seconds and the last error if any.",
+    inputSchema: {},
+    annotations: READ,
+  },
+
   // ===== navigation (client, A*) =============================================================
   {
     name: "navigate_to",

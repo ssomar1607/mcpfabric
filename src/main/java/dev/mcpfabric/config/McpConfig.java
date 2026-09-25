@@ -34,6 +34,9 @@ public final class McpConfig {
 	public boolean enablePlayerControl = true;
 	public boolean enableVision = true;
 
+	/** ffmpeg executable used by record_start (full path, or a name found on PATH). */
+	public String ffmpegPath = "ffmpeg";
+
 	public transient Path source;
 
 	public static McpConfig load() {

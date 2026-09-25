@@ -7,7 +7,13 @@ import dev.mcpfabric.bridge.Json;
 import dev.mcpfabric.bridge.RpcException;
 import dev.mcpfabric.bridge.RpcRouter;
 import dev.mcpfabric.client.ClientMc;
+import dev.mcpfabric.client.showcase.CameraController;
 import dev.mcpfabric.client.showcase.Recorder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import net.minecraft.world.phys.Vec3;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
@@ -161,6 +167,59 @@ public final class ShowcaseHandlers {
 		});
 
 		router.register("record.status", ctx -> statusJson(Recorder.get().status()));
+
+		// ---- cinematic camera ----
+		router.register("camera.fixed", ctx -> {
+			CameraController.get().fixed(key(ctx.params(), 0));
+			return cameraState();
+		});
+
+		router.register("camera.path", ctx -> {
+			JsonArray arr = ctx.params().has("keys") && ctx.params().get("keys").isJsonArray() ? ctx.params().getAsJsonArray("keys") : null;
+			if (arr == null || arr.isEmpty()) throw RpcException.badRequest("keys must be a non-empty array of {t, x, y, z, yaw?, pitch?, lookAt?}");
+			List<CameraController.Key> keys = new ArrayList<>();
+			for (JsonElement e : arr) {
+				JsonObject o = e.getAsJsonObject();
+				keys.add(key(o, o.has("t") ? o.get("t").getAsDouble() : 0));
+			}
+			CameraController.get().path(keys, ctx.optBool("loop", false));
+			return cameraState();
+		});
+
+		router.register("camera.orbit", ctx -> {
+			JsonObject c = ctx.optObject("center");
+			Vec3 center = c == null ? null : new Vec3(c.get("x").getAsDouble(), c.get("y").getAsDouble(), c.get("z").getAsDouble());
+			CameraController.get().orbit(center, ctx.optDouble("centerYOffset", center == null ? 1.1 : 0), ctx.optDouble("radius", 3.5),
+					ctx.optDouble("height", 0.6), ctx.optDouble("startDeg", 0), ctx.optDouble("degPerSec", 30));
+			return cameraState();
+		});
+
+		router.register("camera.release", ctx -> {
+			CameraController.get().off();
+			return cameraState();
+		});
+
+		router.register("camera.state", ctx -> cameraState());
+	}
+
+	private static CameraController.Key key(JsonObject o, double t) throws RpcException {
+		if (!o.has("x") || !o.has("y") || !o.has("z")) throw RpcException.badRequest("a camera key needs x, y and z");
+		Vec3 look = null;
+		if (o.has("lookAt") && o.get("lookAt").isJsonObject()) {
+			JsonObject l = o.getAsJsonObject("lookAt");
+			look = new Vec3(l.get("x").getAsDouble(), l.get("y").getAsDouble(), l.get("z").getAsDouble());
+		}
+		return new CameraController.Key(t, new Vec3(o.get("x").getAsDouble(), o.get("y").getAsDouble(), o.get("z").getAsDouble()),
+				o.has("yaw") ? o.get("yaw").getAsFloat() : 0f, o.has("pitch") ? o.get("pitch").getAsFloat() : 0f, look);
+	}
+
+	private static JsonObject cameraState() {
+		CameraController c = CameraController.get();
+		JsonObject o = new JsonObject();
+		o.addProperty("mode", c.mode().name().toLowerCase(Locale.ROOT));
+		o.addProperty("elapsed", c.elapsed());
+		o.addProperty("duration", c.duration());
+		return o;
 	}
 
 	private static JsonObject state(Minecraft mc) {

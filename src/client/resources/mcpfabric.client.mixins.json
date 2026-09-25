@@ -4,7 +4,8 @@
 	"package": "dev.mcpfabric.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"MinecraftFrameMixin"
+		"MinecraftFrameMixin",
+		"CameraMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -14,6 +14,7 @@ and to record showcase videos. Client-only.
 | `view_state` | `view.state` | Perspective, HUD, chat, FOV, window size, in world, `loading`, `ready` (wait for it) |
 | `screenshot_to_file` | `vision.screenshotToFile` | Full-resolution PNG written on the game machine |
 | `start_recording` / `stop_recording` / `recording_status` | `record.*` | Real-time MP4 (H.264, x264 or NVENC) through ffmpeg |
+| `camera_fixed` / `camera_path` / `camera_orbit` / `camera_release` / `camera_state` | `camera.*` | Cinematic camera: fixed shot, keyframed move (Catmull-Rom, eased, wall-clock timed), orbit around a point or the player; the player stays rendered |
 
 Recording reads every rendered frame back asynchronously (the vanilla screenshot path, so the video is exactly
 what the player sees; a mixin at the end of `Minecraft#runTick` triggers it) and feeds ffmpeg at a fixed frame

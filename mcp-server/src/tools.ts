@@ -550,6 +550,61 @@ export const TOOLS: ToolDef[] = [
 
   // ===== showcase / visual QA (client) =======================================================
   {
+    name: "camera_fixed",
+    method: "camera.fixed",
+    title: "Cinematic camera: fixed shot",
+    description:
+      "Client-only. Detach the camera and hold it at a world position, aimed with yaw/pitch or at `lookAt`. The player keeps being rendered (body, held and worn items) and can still be driven. camera_release to go back to the normal view.",
+    inputSchema: {
+      x: z.number(), y: z.number(), z: z.number(),
+      yaw: z.number().optional(), pitch: z.number().optional(),
+      lookAt: z.object({ x: z.number(), y: z.number(), z: z.number() }).optional(),
+    },
+  },
+  {
+    name: "camera_path",
+    method: "camera.path",
+    title: "Cinematic camera: keyframed move",
+    description:
+      "Client-only. Play a camera move through keyframes (smooth Catmull-Rom path, eased between keys), timed on the wall clock so it lasts exactly its duration in a recording. Each key: t (s), x, y, z and yaw/pitch or lookAt. Holds the last key at the end unless loop=true.",
+    inputSchema: { keys: z.array(z.object({
+  t: z.number().min(0).describe("Seconds from the start of the move."),
+  x: z.number(), y: z.number(), z: z.number(),
+  yaw: z.number().optional(), pitch: z.number().optional(),
+  lookAt: z.object({ x: z.number(), y: z.number(), z: z.number() }).optional().describe("Point to aim at (overrides yaw/pitch)."),
+})).min(1), loop: z.boolean().optional().default(false) },
+  },
+  {
+    name: "camera_orbit",
+    method: "camera.orbit",
+    title: "Cinematic camera: orbit",
+    description:
+      "Client-only. Circle around `center` (or around the player, following it, when omitted) at `radius` blocks, `height` above the aim point, `degPerSec` degrees per second, always looking at the centre (player centre = feet + centerYOffset, default 1.1).",
+    inputSchema: {
+      center: z.object({ x: z.number(), y: z.number(), z: z.number() }).optional(),
+      centerYOffset: z.number().optional(),
+      radius: z.number().min(0.5).max(64).optional().default(3.5),
+      height: z.number().min(-16).max(32).optional().default(0.6),
+      startDeg: z.number().optional().default(0),
+      degPerSec: z.number().min(-360).max(360).optional().default(30),
+    },
+  },
+  {
+    name: "camera_release",
+    method: "camera.release",
+    title: "Cinematic camera: release",
+    description: "Client-only. Give the camera back to the player (normal first/third person view).",
+    inputSchema: {},
+  },
+  {
+    name: "camera_state",
+    method: "camera.state",
+    title: "Cinematic camera state",
+    description: "Client-only. Current camera mode (off, fixed, path, orbit), elapsed seconds and path duration.",
+    inputSchema: {},
+    annotations: READ,
+  },
+  {
     name: "set_perspective",
     method: "view.setPerspective",
     title: "Set camera perspective (F5)",

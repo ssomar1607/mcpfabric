@@ -64,6 +64,11 @@ public final class ShowcaseHandlers {
 			return state(ClientMc.mc());
 		}));
 
+		router.register("view.clearToasts", ctx -> ClientMc.call(() -> {
+			ClientMc.mc().getToastManager().clear();
+			return state(ClientMc.mc());
+		}));
+
 		router.register("view.state", ctx -> ClientMc.call(() -> state(ClientMc.mc())));
 
 		router.register("client.connect", ctx -> {
@@ -165,6 +170,10 @@ public final class ShowcaseHandlers {
 		o.addProperty("width", mc.getWindow().getWidth());
 		o.addProperty("height", mc.getWindow().getHeight());
 		o.addProperty("inWorld", mc.level != null);
+		// true while a resource reload (e.g. the server pack) covers the screen: wait before capturing
+		o.addProperty("loading", mc.getOverlay() != null);
+		o.addProperty("screen", mc.screen == null ? null : mc.screen.getClass().getSimpleName());
+		o.addProperty("ready", mc.level != null && mc.getOverlay() == null && mc.screen == null);
 		return o;
 	}
 

@@ -580,10 +580,17 @@ export const TOOLS: ToolDef[] = [
     inputSchema: { fov: z.number().int().min(30).max(110) },
   },
   {
+    name: "clear_toasts",
+    method: "view.clearToasts",
+    title: "Dismiss notifications",
+    description: "Client-only. Remove the toasts in the top-right corner (resource pack download, recipes, chat verification...) before a capture.",
+    inputSchema: {},
+  },
+  {
     name: "view_state",
     method: "view.state",
     title: "Camera / window state",
-    description: "Client-only. Current perspective, HUD visibility, field of view, window size and whether the client is in a world.",
+    description: "Client-only. Current perspective, HUD/chat visibility, field of view, window size, inWorld, loading (a resource reload such as the server pack covers the screen), the open screen, and ready (in world, nothing covering the view): wait for ready before capturing.",
     inputSchema: {},
     annotations: READ,
   },

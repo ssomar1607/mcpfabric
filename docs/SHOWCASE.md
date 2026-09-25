@@ -10,7 +10,8 @@ and to record showcase videos. Client-only.
 | `set_hud` | `view.setHud` | F1 (also hides the hand) |
 | `set_chat` | `view.setChat` | Hide the chat overlay locally; messages still arrive |
 | `set_fov` | `view.setFov` | Field of view 30..110 |
-| `view_state` | `view.state` | Perspective, HUD, chat, FOV, window size, in world |
+| `clear_toasts` | `view.clearToasts` | Dismiss top-right notifications before a capture |
+| `view_state` | `view.state` | Perspective, HUD, chat, FOV, window size, in world, `loading`, `ready` (wait for it) |
 | `screenshot_to_file` | `vision.screenshotToFile` | Full-resolution PNG written on the game machine |
 | `start_recording` / `stop_recording` / `recording_status` | `record.*` | Real-time MP4 (H.264, x264 or NVENC) through ffmpeg |
 
